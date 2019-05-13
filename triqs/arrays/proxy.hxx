@@ -97,6 +97,9 @@ namespace triqs {
       };
     } // namespace details_proxy
 
+    
+  
+ 
     template <typename A, typename Tuple>
     struct array_const_proxy : public details_proxy::_proxy_impl<A, Tuple, true>, TRIQS_CONCEPT_TAG_NAME(ImmutableArray) {
 
@@ -109,6 +112,7 @@ namespace triqs {
       using traversal_order_t = typename A_t::traversal_order_t;
       using domain_type       = typename indexmap_type::domain_type;
 
+      using regular_type    = array<value_type, domain_type::rank>;
       using view_type       = array_const_view<value_type, domain_type::rank>;
       using const_view_type = array_const_view<value_type, domain_type::rank>;
 
@@ -125,8 +129,10 @@ namespace triqs {
       using B::operator();
       TRIQS_CLEF_IMPLEMENT_LAZY_CALL();
 
+
       template <typename RHS> array_const_proxy &operator=(const RHS &X) = delete; // cannot assign to a const
       TRIQS_DELETE_COMPOUND_OPERATORS(array_const_proxy);
+
 
       friend std::ostream &operator<<(std::ostream &out, array_const_proxy const &x) { return out << view_type(x); }
     };
@@ -135,6 +141,9 @@ namespace triqs {
       return get_shape(x.a).template front_mpop<array_const_proxy<A, T>::n_args>();
     }
 
+    
+  
+ 
     template <typename A, typename Tuple>
     struct array_proxy : public details_proxy::_proxy_impl<A, Tuple, false>, TRIQS_CONCEPT_TAG_NAME(MutableArray) {
 
@@ -147,6 +156,7 @@ namespace triqs {
       using traversal_order_t = typename A_t::traversal_order_t;
       using domain_type       = typename indexmap_type::domain_type;
 
+      using regular_type    = array<value_type, domain_type::rank>;
       using view_type       = array_view<value_type, domain_type::rank>;
       using const_view_type = array_const_view<value_type, domain_type::rank>;
 
@@ -162,6 +172,7 @@ namespace triqs {
 
       using B::operator();
       TRIQS_CLEF_IMPLEMENT_LAZY_CALL();
+
 
       template <typename RHS> array_proxy &operator=(const RHS &X) {
         triqs_arrays_assign_delegation(*this, X);
@@ -181,12 +192,14 @@ namespace triqs {
           ;
       }
 
+
       friend std::ostream &operator<<(std::ostream &out, array_proxy const &x) { return out << view_type(x); }
     };
 
     template <typename A, typename T> auto get_shape(array_proxy<A, T> const &x) {
       return get_shape(x.a).template front_mpop<array_proxy<A, T>::n_args>();
     }
+
 
     // if A is a const_view or A is passed by const &, then the proxy is const, otherwise it is not.
     template <typename A, typename... T>
@@ -205,6 +218,9 @@ namespace triqs {
       return {std::forward<A>(a), n};
     }
 
+    
+  
+ 
     template <typename A, typename Tuple>
     struct matrix_const_proxy : public details_proxy::_proxy_impl<A, Tuple, true>, TRIQS_CONCEPT_TAG_NAME(ImmutableMatrix) {
 
@@ -217,6 +233,7 @@ namespace triqs {
       using traversal_order_t = typename A_t::traversal_order_t;
       using domain_type       = typename indexmap_type::domain_type;
 
+      using regular_type    = matrix<value_type>;
       using view_type       = matrix_const_view<value_type>;
       using const_view_type = matrix_const_view<value_type>;
 
@@ -233,8 +250,10 @@ namespace triqs {
       using B::operator();
       TRIQS_CLEF_IMPLEMENT_LAZY_CALL();
 
+
       template <typename RHS> matrix_const_proxy &operator=(const RHS &X) = delete; // cannot assign to a const
       TRIQS_DELETE_COMPOUND_OPERATORS(matrix_const_proxy);
+
 
       friend std::ostream &operator<<(std::ostream &out, matrix_const_proxy const &x) { return out << view_type(x); }
     };
@@ -243,6 +262,9 @@ namespace triqs {
       return get_shape(x.a).template front_mpop<matrix_const_proxy<A, T>::n_args>();
     }
 
+    
+  
+ 
     template <typename A, typename Tuple>
     struct matrix_proxy : public details_proxy::_proxy_impl<A, Tuple, false>, TRIQS_CONCEPT_TAG_NAME(MutableMatrix) {
 
@@ -255,6 +277,7 @@ namespace triqs {
       using traversal_order_t = typename A_t::traversal_order_t;
       using domain_type       = typename indexmap_type::domain_type;
 
+      using regular_type    = matrix<value_type>;
       using view_type       = matrix_view<value_type>;
       using const_view_type = matrix_const_view<value_type>;
 
@@ -270,6 +293,7 @@ namespace triqs {
 
       using B::operator();
       TRIQS_CLEF_IMPLEMENT_LAZY_CALL();
+
 
       template <typename RHS> matrix_proxy &operator=(const RHS &X) {
         triqs_arrays_assign_delegation(*this, X);
@@ -289,12 +313,14 @@ namespace triqs {
           ;
       }
 
+
       friend std::ostream &operator<<(std::ostream &out, matrix_proxy const &x) { return out << view_type(x); }
     };
 
     template <typename A, typename T> auto get_shape(matrix_proxy<A, T> const &x) {
       return get_shape(x.a).template front_mpop<matrix_proxy<A, T>::n_args>();
     }
+
 
     // if A is a const_view or A is passed by const &, then the proxy is const, otherwise it is not.
     template <typename A, typename... T>

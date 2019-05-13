@@ -33,7 +33,7 @@ namespace triqs {
 
     // ---------------------- vector_view --------------------------------
 
-#define IMPL_TYPE indexmap_storage_pair<indexmaps::cuboid::map<1>, nda::mem::handle<ValueType, 'S'>, void, IsConst, true, Tag::vector_view>
+#define IMPL_TYPE indexmap_storage_pair<indexmaps::cuboid::map<1>, nda::mem::handle<ValueType, 'B'>, void, IsConst, true, Tag::vector_view>
 
     /** */
     template <typename ValueType, bool Borrowed, bool IsConst>

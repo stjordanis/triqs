@@ -33,7 +33,7 @@ namespace triqs {
     // ---------------------- array_view  --------------------------------
 
 #define IMPL_TYPE                                                                                                                                    \
-  indexmap_storage_pair<indexmaps::cuboid::map<Rank, TraversalOrder>, nda::mem::handle<ValueType, 'S'>, TraversalOrder, IsConst, true,               \
+  indexmap_storage_pair<indexmaps::cuboid::map<Rank, TraversalOrder>, nda::mem::handle<ValueType, 'B'>, TraversalOrder, IsConst, true,               \
                         Tag::array_view>
 
     template <typename ValueType, int Rank, typename TraversalOrder, bool Borrowed, bool IsConst>

@@ -50,7 +50,7 @@ namespace triqs {
   bool memory_layout_is_fortran() const { return this->indexmap().strides()[0] < this->indexmap().strides()[1]; }
 
 #define IMPL_TYPE                                                                                                                                    \
-  indexmap_storage_pair<indexmaps::cuboid::map<2, TraversalOrder>, nda::mem::handle<ValueType, 'S'>, TraversalOrder, IsConst, true,       \
+  indexmap_storage_pair<indexmaps::cuboid::map<2, TraversalOrder>, nda::mem::handle<ValueType, 'B'>, TraversalOrder, IsConst, true,       \
                         Tag::matrix_view>
 
     template <typename ValueType, typename TraversalOrder, bool Borrowed, bool IsConst>
