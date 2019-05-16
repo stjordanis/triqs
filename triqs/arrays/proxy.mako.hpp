@@ -112,7 +112,6 @@ namespace triqs {
       using A_t                 = std::decay_t<A>;
       static constexpr int rank = A_t::rank;
 
-      using traversal_order_t = typename A_t::traversal_order_t;
       using domain_type       = typename indexmap_type::domain_type;
 
       // mako %if AM == 'matrix' :

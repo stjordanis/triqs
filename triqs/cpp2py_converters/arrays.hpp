@@ -10,13 +10,13 @@
 namespace cpp2py {
 
   // is_view
-  template <typename T, int R> struct is_view<triqs::arrays::array_view<T, R>> : std::true_type {};
-  template <typename T> struct is_view<triqs::arrays::matrix_view<T>> : std::true_type {};
-  template <typename T> struct is_view<triqs::arrays::vector_view<T>> : std::true_type {};
+  template <typename T, int R> struct is_view<triqs::arrays::array_shared_view<T, R>> : std::true_type {};
+  template <typename T> struct is_view<triqs::arrays::matrix_shared_view<T>> : std::true_type {};
+  template <typename T> struct is_view<triqs::arrays::vector_shared_view<T>> : std::true_type {};
 
-  template <typename T, int R> struct is_view<triqs::arrays::array_const_view<T, R>> : std::true_type {};
-  template <typename T> struct is_view<triqs::arrays::matrix_const_view<T>> : std::true_type {};
-  template <typename T> struct is_view<triqs::arrays::vector_const_view<T>> : std::true_type {};
+  template <typename T, int R> struct is_view<triqs::arrays::array_const_shared_view<T, R>> : std::true_type {};
+  template <typename T> struct is_view<triqs::arrays::matrix_const_shared_view<T>> : std::true_type {};
+  template <typename T> struct is_view<triqs::arrays::vector_const_shared_view<T>> : std::true_type {};
 
   // FIXME : std::array instead
   // --- mini_vector<T,N>---
@@ -51,7 +51,7 @@ namespace cpp2py {
       bool enforce_copy = not is_view<ArrayType>::value; // force copy if not a view
       bool ok           = E.extract(ob, enforce_copy);
       if (!ok)
-        TRIQS_RUNTIME_ERROR << " construction of an array/array_view from a numpy  "
+        TRIQS_RUNTIME_ERROR << " construction of an array/array_shared_view from a numpy  "
                             << "\n   T = "
                             << triqs::utility::typeid_name(typename ArrayType::value_type())
                             // lead to a nasty link pb ???
@@ -97,19 +97,19 @@ namespace cpp2py {
     }
   };
 
-  template <typename T, int R> struct py_converter<triqs::arrays::array_view<T, R>> : py_converter_array<triqs::arrays::array_view<T, R>> {};
-  template <typename T> struct py_converter<triqs::arrays::matrix_view<T>> : py_converter_array<triqs::arrays::matrix_view<T>> {};
-  template <typename T> struct py_converter<triqs::arrays::vector_view<T>> : py_converter_array<triqs::arrays::vector_view<T>> {};
+  template <typename T, int R> struct py_converter<triqs::arrays::array_shared_view<T, R>> : py_converter_array<triqs::arrays::array_shared_view<T, R>> {};
+  template <typename T> struct py_converter<triqs::arrays::matrix_shared_view<T>> : py_converter_array<triqs::arrays::matrix_shared_view<T>> {};
+  template <typename T> struct py_converter<triqs::arrays::vector_shared_view<T>> : py_converter_array<triqs::arrays::vector_shared_view<T>> {};
 
   template <typename T, int R>
-  struct py_converter<triqs::arrays::array_const_view<T, R>> : py_converter_array<triqs::arrays::array_const_view<T, R>> {};
-  template <typename T> struct py_converter<triqs::arrays::matrix_const_view<T>> : py_converter_array<triqs::arrays::matrix_const_view<T>> {};
-  template <typename T> struct py_converter<triqs::arrays::vector_const_view<T>> : py_converter_array<triqs::arrays::vector_const_view<T>> {};
+  struct py_converter<triqs::arrays::array_const_shared_view<T, R>> : py_converter_array<triqs::arrays::array_const_shared_view<T, R>> {};
+  template <typename T> struct py_converter<triqs::arrays::matrix_const_shared_view<T>> : py_converter_array<triqs::arrays::matrix_const_shared_view<T>> {};
+  template <typename T> struct py_converter<triqs::arrays::vector_const_shared_view<T>> : py_converter_array<triqs::arrays::vector_const_shared_view<T>> {};
 
   // FIXME : better, but there is ONE error in lattice_tools !
-  //struct py_converter<triqs::arrays::array_const_view<T, R>> : py_converter_array_cvt<triqs::arrays::array_const_view<T, R>> {};
-  //template <typename T> struct py_converter<triqs::arrays::matrix_const_view<T>> : py_converter_array_cvt<triqs::arrays::matrix_const_view<T>> {};
-  //template <typename T> struct py_converter<triqs::arrays::vector_const_view<T>> : py_converter_array_cvt<triqs::arrays::vector_const_view<T>> {};
+  //struct py_converter<triqs::arrays::array_const_shared_view<T, R>> : py_converter_array_cvt<triqs::arrays::array_const_shared_view<T, R>> {};
+  //template <typename T> struct py_converter<triqs::arrays::matrix_const_shared_view<T>> : py_converter_array_cvt<triqs::arrays::matrix_const_shared_view<T>> {};
+  //template <typename T> struct py_converter<triqs::arrays::vector_const_shared_view<T>> : py_converter_array_cvt<triqs::arrays::vector_const_shared_view<T>> {};
 
   template <typename T, int R> struct py_converter<triqs::arrays::array<T, R>> : py_converter_array<triqs::arrays::array<T, R>> {};
   template <typename T> struct py_converter<triqs::arrays::matrix<T>> : py_converter_array<triqs::arrays::matrix<T>> {};

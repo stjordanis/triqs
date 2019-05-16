@@ -28,8 +28,8 @@
 namespace triqs {
   namespace arrays {
 
-    template <typename ValueType, typename TraversalOrder = void, bool Borrowed = false, bool IsConst = false> class matrix_view;
-    template <typename ValueType, typename TraversalOrder = void> class matrix;
+    template <typename ValueType, char B_S = 'B', bool IsConst = false> class matrix_view;
+    template <typename ValueType> class matrix;
 
 // ---------------------- matrix --------------------------------
 //
@@ -49,17 +49,17 @@ namespace triqs {
   bool memory_layout_is_c() const { return this->indexmap().strides()[0] >= this->indexmap().strides()[1]; }                                         \
   bool memory_layout_is_fortran() const { return this->indexmap().strides()[0] < this->indexmap().strides()[1]; }
 
-#define IMPL_TYPE                                                                                                                                    \
-  indexmap_storage_pair<indexmaps::cuboid::map<2, TraversalOrder>, nda::mem::handle<ValueType, 'B'>, TraversalOrder, IsConst, true,       \
-                        Tag::matrix_view>
+#define IMPL_TYPE indexmap_storage_pair<indexmaps::cuboid::map<2>, nda::mem::handle<ValueType, B_S>, IsConst, true, B_S, Tag::matrix_view>
 
-    template <typename ValueType, typename TraversalOrder, bool Borrowed, bool IsConst>
+    template <typename ValueType, char B_S, bool IsConst>
     class matrix_view : Tag::matrix_view, TRIQS_CONCEPT_TAG_NAME(MutableMatrix), public IMPL_TYPE {
+      static_assert(B_S=='B' or B_S=='S', "Internal error"); // REPLACE BY STRONG ENUM
+
       public:
-      using regular_type    = matrix<ValueType, TraversalOrder>;
-      using view_type       = matrix_view<ValueType, TraversalOrder>;
-      using const_view_type = matrix_view<ValueType, TraversalOrder, false, true>;
-      using weak_view_type  = matrix_view<ValueType, TraversalOrder, true>;
+      using regular_type    = matrix<ValueType>;
+      using view_type       = matrix_view<ValueType, B_S, false>;
+      using const_view_type = matrix_view<ValueType, B_S, true>;
+      //using weak_view_type  = matrix_view<ValueType, true>;
       using indexmap_type   = typename IMPL_TYPE::indexmap_type;
       using storage_type    = typename IMPL_TYPE::storage_type;
 
@@ -87,7 +87,7 @@ namespace triqs {
       }
 
       // rebind the other view, iif this is const, and the other is not.
-      template <typename To2, bool C = IsConst> ENABLE_IFC(C) rebind(matrix_view<ValueType, To2, Borrowed, !IsConst> const &X) {
+      template <bool C = IsConst> ENABLE_IFC(C) rebind(matrix_view<ValueType, B_S, !IsConst> const &X) {
         this->indexmap_ = X.indexmap_;
         this->storage_  = X.storage_;
       }
@@ -111,27 +111,27 @@ namespace triqs {
 
     //---------------------------------------------------------------------
     // this traits is used by indexmap_storage_pair, when slicing to find the correct view type.
-    template <class V, int R, typename TraversalOrder, bool Borrowed, bool IsConst>
-    struct ISPViewType<V, R, TraversalOrder, Tag::matrix_view, Borrowed, IsConst>
-       : std::conditional<R == 1, vector_view<V, Borrowed, IsConst>, matrix_view<V, TraversalOrder, Borrowed, IsConst>> {};
+    template <class V, int R, char B_S, bool IsConst>
+    struct ISPViewType<V, R, Tag::matrix_view, B_S, IsConst> : std::conditional<R == 1, vector_view<V, B_S, IsConst>, matrix_view<V, B_S, IsConst>> {
+    };
 #undef IMPL_TYPE
 
-    template <typename ValueType, typename TraversalOrder = void, bool Borrowed = false>
-    using matrix_const_view = matrix_view<ValueType, TraversalOrder, Borrowed, true>;
+    template <typename ValueType> using matrix_const_view        = matrix_view<ValueType, 'B', true>;
+    template <typename ValueType> using matrix_shared_view       = matrix_view<ValueType, 'S', false>;
+    template <typename ValueType> using matrix_const_shared_view = matrix_view<ValueType, 'S', true>;
 
 // ---------------------- matrix --------------------------------
-#define IMPL_TYPE                                                                                                                                    \
-  indexmap_storage_pair<indexmaps::cuboid::map<2, TraversalOrder>, nda::mem::handle<ValueType, 'R'>, TraversalOrder, false, false, Tag::matrix_view>
+#define IMPL_TYPE indexmap_storage_pair<indexmaps::cuboid::map<2>, nda::mem::handle<ValueType, 'R'>, false, false, 'B', Tag::matrix_view>
 
-    template <typename ValueType, typename TraversalOrder> class matrix : Tag::matrix, TRIQS_CONCEPT_TAG_NAME(MutableMatrix), public IMPL_TYPE {
+    template <typename ValueType> class matrix : Tag::matrix, TRIQS_CONCEPT_TAG_NAME(MutableMatrix), public IMPL_TYPE {
       public:
       using value_type      = typename IMPL_TYPE::value_type;
       using storage_type    = typename IMPL_TYPE::storage_type;
       using indexmap_type   = typename IMPL_TYPE::indexmap_type;
-      using regular_type    = matrix<ValueType, TraversalOrder>;
-      using view_type       = matrix_view<ValueType, TraversalOrder>;
-      using const_view_type = matrix_view<ValueType, TraversalOrder, false, true>;
-      using weak_view_type  = matrix_view<ValueType, TraversalOrder, true>;
+      using regular_type    = matrix<ValueType>;
+      using view_type       = matrix_view<ValueType>;
+      using const_view_type = matrix_const_view<ValueType>;
+      //using weak_view_type  = matrix_view<ValueType, true>;
 
       /// Empty matrix.
       matrix(memory_layout_t<2> ml = memory_layout_t<2>{}) : IMPL_TYPE(indexmap_type(ml)) {}
@@ -170,9 +170,9 @@ namespace triqs {
    *  - a expression : e.g. matrix<int> A = B+ 2*C;
    */
       template <typename T>
-      matrix(const T &X,
-             std::enable_if_t<ImmutableCuboidArray<T>::value && std::is_convertible<typename T::value_type, value_type>::value, void *> _unused =
-                nullptr)
+      matrix(
+         const T &X,
+         std::enable_if_t<ImmutableCuboidArray<T>::value && std::is_convertible<typename T::value_type, value_type>::value, void *> _unused = nullptr)
          : IMPL_TYPE(indexmap_type(X.domain(), get_memory_layout<2, T>::invoke(X))) {
         triqs_arrays_assign_delegation(*this, X);
       }
@@ -263,7 +263,7 @@ namespace triqs {
     }
 
     template <typename ArrayType>
-    matrix_view<typename ArrayType::value_type, typename ArrayType::traversal_order_t, true> make_matrix_view(ArrayType const &a) {
+    matrix_view<typename ArrayType::value_type> make_matrix_view(ArrayType const &a) {
       static_assert(ArrayType::rank == 2, "make_matrix_view only works for array of rank 2");
       return a;
     }
@@ -311,7 +311,7 @@ namespace triqs {
 // The std::swap is WRONG for a view because of the copy/move semantics of view.
 // Use swap instead (the correct one, found by ADL).
 namespace std {
-  template <typename V, typename To1, typename To2, bool B1, bool B2, bool C1, bool C2>
-  void swap(triqs::arrays::matrix_view<V, To1, B1, C1> &a, triqs::arrays::matrix_view<V, To2, B2, C2> &b) = delete;
+  template <typename V, char B1, char B2, bool C1, bool C2>
+  void swap(triqs::arrays::matrix_view<V, B1, C1> &a, triqs::arrays::matrix_view<V, B2, C2> &b) = delete;
 }
 #include "./expression_template/matrix_algebra.hpp"

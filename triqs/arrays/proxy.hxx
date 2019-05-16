@@ -97,9 +97,9 @@ namespace triqs {
       };
     } // namespace details_proxy
 
-    
-  
- 
+
+
+
     template <typename A, typename Tuple>
     struct array_const_proxy : public details_proxy::_proxy_impl<A, Tuple, true>, TRIQS_CONCEPT_TAG_NAME(ImmutableArray) {
 
@@ -109,7 +109,6 @@ namespace triqs {
       using A_t                 = std::decay_t<A>;
       static constexpr int rank = A_t::rank;
 
-      using traversal_order_t = typename A_t::traversal_order_t;
       using domain_type       = typename indexmap_type::domain_type;
 
       using regular_type    = array<value_type, domain_type::rank>;
@@ -141,9 +140,9 @@ namespace triqs {
       return get_shape(x.a).template front_mpop<array_const_proxy<A, T>::n_args>();
     }
 
-    
-  
- 
+
+
+
     template <typename A, typename Tuple>
     struct array_proxy : public details_proxy::_proxy_impl<A, Tuple, false>, TRIQS_CONCEPT_TAG_NAME(MutableArray) {
 
@@ -153,7 +152,6 @@ namespace triqs {
       using A_t                 = std::decay_t<A>;
       static constexpr int rank = A_t::rank;
 
-      using traversal_order_t = typename A_t::traversal_order_t;
       using domain_type       = typename indexmap_type::domain_type;
 
       using regular_type    = array<value_type, domain_type::rank>;
@@ -218,9 +216,9 @@ namespace triqs {
       return {std::forward<A>(a), n};
     }
 
-    
-  
- 
+
+
+
     template <typename A, typename Tuple>
     struct matrix_const_proxy : public details_proxy::_proxy_impl<A, Tuple, true>, TRIQS_CONCEPT_TAG_NAME(ImmutableMatrix) {
 
@@ -230,7 +228,6 @@ namespace triqs {
       using A_t                 = std::decay_t<A>;
       static constexpr int rank = A_t::rank;
 
-      using traversal_order_t = typename A_t::traversal_order_t;
       using domain_type       = typename indexmap_type::domain_type;
 
       using regular_type    = matrix<value_type>;
@@ -262,9 +259,9 @@ namespace triqs {
       return get_shape(x.a).template front_mpop<matrix_const_proxy<A, T>::n_args>();
     }
 
-    
-  
- 
+
+
+
     template <typename A, typename Tuple>
     struct matrix_proxy : public details_proxy::_proxy_impl<A, Tuple, false>, TRIQS_CONCEPT_TAG_NAME(MutableMatrix) {
 
@@ -274,7 +271,6 @@ namespace triqs {
       using A_t                 = std::decay_t<A>;
       static constexpr int rank = A_t::rank;
 
-      using traversal_order_t = typename A_t::traversal_order_t;
       using domain_type       = typename indexmap_type::domain_type;
 
       using regular_type    = matrix<value_type>;
