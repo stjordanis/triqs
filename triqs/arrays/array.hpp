@@ -74,6 +74,8 @@ namespace triqs {
         this->storage_  = X.storage_;
       }
 
+      //void rebind(regular_type &&) = delete;
+
       // rebind the other view, iif this is const, and the other is not.
       template <typename To, bool C = IsConst> ENABLE_IFC(C) rebind(array_view<ValueType, Rank, To, Borrowed, !IsConst> const &X) {
         this->indexmap_ = X.indexmap();

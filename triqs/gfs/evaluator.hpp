@@ -91,7 +91,7 @@ namespace triqs {
 
       static constexpr int arity = sizeof...(Ms); // METTRE ARITY DANS LA MESH !
 
-      template <typename G, typename... Args> const auto operator()(G const &g, Args &&... args) const {
+      template <typename G, typename... Args> auto operator()(G const &g, Args &&... args) const {
         static_assert(sizeof...(Args) == arity, "Wrong number of arguments in gf evaluation");
 
         using r1_t = decltype(g.mesh().evaluate(g, std::forward<Args>(args)...));
