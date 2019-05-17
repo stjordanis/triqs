@@ -149,31 +149,32 @@ for Target in  ["scalar_valued", "matrix_valued", "tensor_valued<3>", "tensor_va
 
     # === Matsubara and ReTime/Freq Fourier
     for Meshes in [["imtime", "imfreq"], ["imfreq", "imtime"], ["retime", "refreq"], ["refreq", "retime"]]:
-        for gf_type in ["gf_view", "block_gf_view", "block2_gf_view"]:
+        for gf_type in ["gf", "block_gf", "block2_gf"]:
+	    gf_view_type = gf_type +  '_view'
 
             # make_gf_from_fourier
             m.add_function(name = "make_gf_from_fourier",
-                    signature="%s<%s, %s> make_gf_from_fourier(%s<%s, %s> g_in)"%(gf_type, Meshes[0], Target, gf_type, Meshes[1], Target),
+                    signature="%s<%s, %s> make_gf_from_fourier(%s<%s, %s> g_in)"%(gf_type, Meshes[0], Target, gf_view_type, Meshes[1], Target),
                     doc ="""Create Green function from the Fourier transform of g_in""")
 
             # set_from_fourier
-            m.add_function("void set_from_fourier(%s<%s, %s> g_out, %s<%s, %s> g_in)"%(gf_type, Meshes[0], Target, gf_type, Meshes[1], Target),
+            m.add_function("void set_from_fourier(%s<%s, %s> g_out, %s<%s, %s> g_in)"%(gf_view_type, Meshes[0], Target, gf_view_type, Meshes[1], Target),
                     calling_pattern = "g_out = fourier(g_in)",
                     doc = """Fills self with the Fourier transform of g_in""")
 
         # make_gf_from_fourier with known moments
         m.add_function(name = "make_gf_from_fourier",
-               signature="gf_view<%s, %s> make_gf_from_fourier(gf_view<%s, %s> g_in, gf_mesh<%s> mesh, array_const_view<dcomplex, %s::rank + 1> known_moments)"%(Meshes[0], Target, Meshes[1], Target, Meshes[0], Target),
+               signature="gf<%s, %s> make_gf_from_fourier(gf_view<%s, %s> g_in, gf_mesh<%s> mesh, array_const_view<dcomplex, %s::rank + 1> known_moments)"%(Meshes[0], Target, Meshes[1], Target, Meshes[0], Target),
                doc ="""Create Green function from the Fourier transform of g_in using the known high-frequency moments""")
 
         # FIXME We are making copies of the tail
         m.add_function(name = "make_gf_from_fourier",
-                signature="block_gf_view<%s, %s> make_gf_from_fourier(block_gf_view<%s, %s> g_in, gf_mesh<%s> mesh, std::vector<array<dcomplex, %s::rank + 1>> known_moments)"%(Meshes[0], Target, Meshes[1], Target, Meshes[0], Target),
+                signature="block_gf<%s, %s> make_gf_from_fourier(block_gf_view<%s, %s> g_in, gf_mesh<%s> mesh, std::vector<array<dcomplex, %s::rank + 1>> known_moments)"%(Meshes[0], Target, Meshes[1], Target, Meshes[0], Target),
                doc ="""Create Green function from the Fourier transform of g_in using the known high-frequency moments""")
 
         # FIXME We are making copies of the tail
         m.add_function(name = "make_gf_from_fourier",
-                signature="block2_gf_view<%s, %s> make_gf_from_fourier(block2_gf_view<%s, %s> g_in, gf_mesh<%s> mesh, std::vector<std::vector<array<dcomplex, %s::rank + 1>>> known_moments)"%(Meshes[0], Target, Meshes[1], Target, Meshes[0], Target),
+                signature="block2_gf<%s, %s> make_gf_from_fourier(block2_gf_view<%s, %s> g_in, gf_mesh<%s> mesh, std::vector<std::vector<array<dcomplex, %s::rank + 1>>> known_moments)"%(Meshes[0], Target, Meshes[1], Target, Meshes[0], Target),
                doc ="""Create Green function from the Fourier transform of g_in using the known high-frequency moments""")
 
         # set_from_fourier with known moments
@@ -194,30 +195,30 @@ for Target in  ["scalar_valued", "matrix_valued", "tensor_valued<3>", "tensor_va
 
     # Additional overloads for make_gf_from_fourier
     m.add_function(name = "make_gf_from_fourier",
-                   signature="gf_view<imfreq, %s> make_gf_from_fourier(gf_view<imtime, %s> g_in, int n_iw)"%(Target, Target),
+                   signature="gf<imfreq, %s> make_gf_from_fourier(gf_view<imtime, %s> g_in, int n_iw)"%(Target, Target),
                    doc ="""Create Green function from the Fourier transform of g_tau""")
     m.add_function(name = "make_gf_from_fourier",
-                   signature="gf_view<imtime, %s> make_gf_from_fourier(gf_view<imfreq, %s> g_in, int n_tau)"%(Target, Target),
+                   signature="gf<imtime, %s> make_gf_from_fourier(gf_view<imfreq, %s> g_in, int n_tau)"%(Target, Target),
                    doc ="""Create Green function from the Fourier transform of g_iw""")
 
     m.add_function(name = "make_gf_from_fourier",
-                   signature="gf_view<refreq, %s> make_gf_from_fourier(gf_view<retime, %s> g_in, bool shift_half_bin)"%(Target, Target),
+                   signature="gf<refreq, %s> make_gf_from_fourier(gf_view<retime, %s> g_in, bool shift_half_bin)"%(Target, Target),
                    doc ="""Create Green function from the Fourier transform of g_t""")
     m.add_function(name = "make_gf_from_fourier",
-                   signature="gf_view<retime, %s> make_gf_from_fourier(gf_view<refreq, %s> g_in, bool shift_half_bin)"%(Target, Target),
+                   signature="gf<retime, %s> make_gf_from_fourier(gf_view<refreq, %s> g_in, bool shift_half_bin)"%(Target, Target),
                    doc ="""Create Green function from the Fourier transform of g_w""")
 
     # === Lattice Fourier
     for Meshes in [["cyclic_lattice", "brillouin_zone"], ["brillouin_zone", "cyclic_lattice"]]:
-        for gf_type in ["gf_view", "block_gf_view", "block2_gf_view"]:
-
+        for gf_type in ["gf", "block_gf", "block2_gf"]:
+	    gf_view_type = gf_type +  '_view'
             # make_gf_from_fourier
             m.add_function(name = "make_gf_from_fourier",
-                    signature="%s<%s, %s> make_gf_from_fourier(%s<%s, %s> g_in)"%(gf_type, Meshes[0], Target, gf_type, Meshes[1], Target),
+                    signature="%s<%s, %s> make_gf_from_fourier(%s<%s, %s> g_in)"%(gf_type, Meshes[0], Target, gf_view_type, Meshes[1], Target),
                     doc ="""Create Green function from the Fourier transform of g_in""")
 
             # set_from_fourier
-            m.add_function("void set_from_fourier(%s<%s, %s> g_out, %s<%s, %s> g_in)"%(gf_type, Meshes[0], Target, gf_type, Meshes[1], Target),
+            m.add_function("void set_from_fourier(%s<%s, %s> g_out, %s<%s, %s> g_in)"%(gf_view_type, Meshes[0], Target, gf_view_type, Meshes[1], Target),
                     calling_pattern = "g_out = fourier(g_in)",
                     doc = """Fills self with the Fourier transform of g_in""")
 

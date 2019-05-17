@@ -105,8 +105,6 @@ namespace triqs {
     };
 
     template <typename ValueType> using vector_const_view = vector_view<ValueType,'B', true>;
-    template <typename ValueType> using vector_shared_view = vector_view<ValueType,'S', false>;
-    template <typename ValueType> using vector_const_shared_view = vector_view<ValueType,'S', true>;
 
 // ---------------------- vector--------------------------------
 #define IMPL_TYPE indexmap_storage_pair<indexmaps::cuboid::map<1>, nda::mem::handle<ValueType, 'R'>, false, false, 'B', Tag::vector_view>

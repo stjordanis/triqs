@@ -53,15 +53,15 @@ namespace triqs {
 
     template <typename ValueType, char B_S, bool IsConst>
     class matrix_view : Tag::matrix_view, TRIQS_CONCEPT_TAG_NAME(MutableMatrix), public IMPL_TYPE {
-      static_assert(B_S=='B' or B_S=='S', "Internal error"); // REPLACE BY STRONG ENUM
+      static_assert(B_S == 'B' or B_S == 'S', "Internal error"); // REPLACE BY STRONG ENUM
 
       public:
       using regular_type    = matrix<ValueType>;
       using view_type       = matrix_view<ValueType, B_S, false>;
       using const_view_type = matrix_view<ValueType, B_S, true>;
       //using weak_view_type  = matrix_view<ValueType, true>;
-      using indexmap_type   = typename IMPL_TYPE::indexmap_type;
-      using storage_type    = typename IMPL_TYPE::storage_type;
+      using indexmap_type = typename IMPL_TYPE::indexmap_type;
+      using storage_type  = typename IMPL_TYPE::storage_type;
 
       /// Build from an IndexMap and a storage
       template <typename S> matrix_view(typename IMPL_TYPE::indexmap_type const &Ind, S const &Mem) : IMPL_TYPE(Ind, Mem) {}
@@ -116,9 +116,7 @@ namespace triqs {
     };
 #undef IMPL_TYPE
 
-    template <typename ValueType> using matrix_const_view        = matrix_view<ValueType, 'B', true>;
-    template <typename ValueType> using matrix_shared_view       = matrix_view<ValueType, 'S', false>;
-    template <typename ValueType> using matrix_const_shared_view = matrix_view<ValueType, 'S', true>;
+    template <typename ValueType> using matrix_const_view = matrix_view<ValueType, 'B', true>;
 
 // ---------------------- matrix --------------------------------
 #define IMPL_TYPE indexmap_storage_pair<indexmaps::cuboid::map<2>, nda::mem::handle<ValueType, 'R'>, false, false, 'B', Tag::matrix_view>
@@ -148,6 +146,13 @@ namespace triqs {
 
       /** Makes a true (deep) copy of the data. */
       matrix(const matrix &X) : IMPL_TYPE(X.indexmap(), nda::mem::handle<value_type, 'R'>{X.storage()}) {}
+
+      // from a temporary storage and an indexmap. Used for reshaping a temporary array
+      explicit matrix(typename indexmap_type::domain_type const &dom, storage_type &&sto, memory_layout_t<2> ml = memory_layout_t<2>{})
+         : IMPL_TYPE(indexmap_type(dom, ml), std::move(sto)) {}
+
+      // from a temporary storage and an indexmap. Used for reshaping a temporary array
+      explicit matrix(indexmap_type const &idx_map, storage_type &&sto) : IMPL_TYPE(idx_map, std::move(sto)) {}
 
       /**
    * Build a new matrix from X.domain() and fill it with by evaluating X. X can be :
@@ -262,8 +267,7 @@ namespace triqs {
       return r;
     }
 
-    template <typename ArrayType>
-    matrix_view<typename ArrayType::value_type> make_matrix_view(ArrayType const &a) {
+    template <typename ArrayType> matrix_view<typename ArrayType::value_type> make_matrix_view(ArrayType const &a) {
       static_assert(ArrayType::rank == 2, "make_matrix_view only works for array of rank 2");
       return a;
     }

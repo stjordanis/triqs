@@ -37,7 +37,7 @@ namespace triqs {
     template <typename ValueType, int Rank, char B_S, bool IsConst>
     class array_view : Tag::array_view, TRIQS_CONCEPT_TAG_NAME(MutableArray), public IMPL_TYPE {
       static_assert(Rank > 0, " Rank must be >0");
-      static_assert(B_S=='B' or B_S=='S', "Internal error"); // REPLACE BY STRONG ENUM
+      static_assert(B_S=='B', "Internal error"); // REPLACE BY STRONG ENUM
 
       public:
       using indexmap_type   = typename IMPL_TYPE::indexmap_type;
@@ -113,10 +113,6 @@ namespace triqs {
 
     template <typename ValueType, int Rank> using array_const_view = array_view<ValueType, Rank, 'B', true>;
 
-    template <typename ValueType, int Rank> using array_shared_view = array_view<ValueType, Rank, 'S', false>;
-
-    template <typename ValueType, int Rank> using array_const_shared_view = array_view<ValueType, Rank, 'S', true>;
-
     //------------------------------- array ---------------------------------------------------
 
 #define IMPL_TYPE indexmap_storage_pair<indexmaps::cuboid::map<Rank>, nda::mem::handle<ValueType, 'R'>, false, false, 'B', Tag::array_view>
@@ -168,6 +164,10 @@ namespace triqs {
       // from a temporary storage and an indexmap. Used for reshaping a temporary array
       explicit array(typename indexmap_type::domain_type const &dom, storage_type &&sto, memory_layout_t<Rank> ml = memory_layout_t<Rank>{})
          : IMPL_TYPE(indexmap_type(dom, ml), std::move(sto)) {}
+
+      // from a temporary storage and an indexmap. Used for reshaping a temporary array
+      explicit array(indexmap_type const &idx_map, storage_type &&sto)
+         : IMPL_TYPE(idx_map, std::move(sto)) {}
 
       /**
      * Build a new array from X.domain() and fill it with by evaluating X. X can be :
