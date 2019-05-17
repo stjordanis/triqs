@@ -25,7 +25,7 @@
 #include <complex>
 #include <type_traits>
 #include <cstring>
-#include "./allocators.hpp"
+#include "./blk.hpp"
 #include "./rtable.hpp"
 
 namespace nda::mem {
@@ -333,8 +333,8 @@ namespace nda::mem {
   template <typename T> struct handle<T, 'B'> {
     private:
     handle<T, 'R'> const *_parent = nullptr; // parent
-    T *_data               = nullptr; // Pointer to the start of the memory block
-    size_t _size           = 0;       // Size of the memory block. Invariant: size > 0 iif data != 0
+    T *_data                      = nullptr; // Pointer to the start of the memory block
+    size_t _size                  = 0;       // Size of the memory block. Invariant: size > 0 iif data != 0
 
     public:
     using value_type = T;
@@ -348,12 +348,12 @@ namespace nda::mem {
 
     bool is_null() const noexcept { return _data == nullptr; }
 
-    handle<T, 'R'> const * parent() const { return _parent;}
+    handle<T, 'R'> const *parent() const { return _parent; }
 
     // A const-handle does not entail T const data
-    T *data() const noexcept { return (_parent ? _parent->data(): _data); }
+    //T *data() const noexcept { return (_parent ? _parent->data() : _data); }
     //T *data() const noexcept { return parent->data(); }
-    //T *data() const noexcept { return _data; }
+    T *data() const noexcept { return _data; }
 
     long size() const noexcept { return _size; }
   };
