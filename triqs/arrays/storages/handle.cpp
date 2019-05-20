@@ -5,7 +5,7 @@
 
 // FIXME comment
 //#define NDA_LEAK_CHECK
-#define USE_ALLOCATOR_MBUCKET
+//#define USE_ALLOCATOR_MBUCKET
 
 namespace nda::mem {
 
