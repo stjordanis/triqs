@@ -18,13 +18,13 @@ namespace nda::mem {
 #ifdef USE_ALLOCATOR_MBUCKET
   using allocator_base_t = allocators::segregator<8*100, allocators::multiple_bucket<8*100>, allocators::mallocator>;
 #else
-  using allocator_base_t =  allocators::mallocator;
+  using allocator_base_t = allocators::mallocator;
 #endif
 
 #ifndef NDA_LEAK_CHECK
   using allocator_t = allocator_base_t;
 #else
-  using allocator_t = allocators::stats<allocator_base_t>;
+  using allocator_t = allocators::leak_check<allocator_base_t>;
 #endif
 
   allocator_t alloc;
