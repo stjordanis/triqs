@@ -157,7 +157,7 @@ namespace nda::allocators {
 
     void deallocate(blk_t b) noexcept {
       //[[likely]]
-      if (bu->owns(b)) {
+      if (bu != bu_vec.end() and bu->owns(b)) {
         bu->deallocate(b);
         return;
       }
